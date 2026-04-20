@@ -1,131 +1,170 @@
-# SigMap JetBrains Plugin
+<div align="center">
 
-AI context engine for IntelliJ IDEA, WebStorm, PyCharm, GoLand, RubyMine, and all JetBrains IDEs.
+# SigMap — JetBrains Plugin
 
-![SigMap JetBrains plugin — status bar health grade, regenerate action, and context auto-refresh](https://raw.githubusercontent.com/manojmallick/sigmap/main/assets/intelij.gif)
+### AI context engine for IntelliJ IDEA, WebStorm, PyCharm, GoLand and all JetBrains IDEs
+
+[![JetBrains Marketplace](https://img.shields.io/jetbrains/plugin/v/26371-sigmap--ai-context-engine?label=JetBrains%20Marketplace&color=7c6af7&logo=jetbrains)](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/26371-sigmap--ai-context-engine?color=blue&logo=jetbrains)](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
+[![Rating](https://img.shields.io/jetbrains/plugin/r/rating/26371-sigmap--ai-context-engine?color=brightgreen)](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
+[![Release](https://img.shields.io/github/v/release/manojmallick/sigmap-jetbrains?color=7c6af7&label=release)](https://github.com/manojmallick/sigmap-jetbrains/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Node ≥18](https://img.shields.io/badge/node-%E2%89%A518-brightgreen?logo=node.js)](https://nodejs.org)
+
+**80.0% retrieval hit@5 · 96.9% token reduction · 29 languages · Zero npm deps**
+
+</div>
+
+---
+
+## What is SigMap?
+
+SigMap extracts a compact **signature map** of your entire codebase — function names, class hierarchies, exported types, interfaces — and writes it to `.github/copilot-instructions.md` automatically. Every AI coding assistant reads that file as its first-message context.
+
+This plugin brings SigMap directly into JetBrains IDEs with a live health grade in the status bar, one-click regeneration, and auto-refresh.
+
+```
+Before SigMap: "I don't know your codebase — can you share some files?"
+After SigMap:  "I can see your AuthService, UserRepository, 47 API routes…"
+```
+
+---
+
+## What's new in v4.0
+
+- Standalone release — independent version cycle from the SigMap CLI core
+- Compatible with SigMap CLI v6.0 (graph-boosted retrieval, incremental cache)
+- Updated IDE compatibility: IntelliJ 2024.1 → 2026.1
+
+---
 
 ## Features
 
-- **Health Status Bar** — Shows context health grade (A-F) and age (e.g., "SigMap: B 3h")
-- **Regenerate Context** — Tools → SigMap → Regenerate Context (Ctrl+Alt+G)
-- **Open Context File** — Quickly open `.github/copilot-instructions.md`
-- **View Roadmap** — Open SigMap roadmap in browser
-- **Auto-refresh** — Status updates every 60 seconds
+| Feature | Description |
+|---|---|
+| **Health Status Bar** | Live grade A–F + age (`SigMap: B 3h`) in the bottom status bar |
+| **Regenerate Context** | Tools → SigMap → Regenerate Context or `Ctrl+Alt+G` |
+| **Open Context File** | One click to open `.github/copilot-instructions.md` |
+| **View Roadmap** | Opens the SigMap docs in your browser |
+| **Auto-refresh** | Status re-checks every 60 seconds |
+
+### Health grades
+
+| Grade | Age | Meaning |
+|:---:|---|---|
+| **A** | < 1 hour | Fresh — AI has full context |
+| **B** | 1–6 hours | Good |
+| **C** | 6–12 hours | Aging — regenerate soon |
+| **D** | 12–24 hours | Stale |
+| **F** | > 24 hours | Expired — regenerate now |
+
+---
 
 ## Installation
 
-### From JetBrains Marketplace (Recommended)
-
-Marketplace page: https://plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine/
+### JetBrains Marketplace (recommended)
 
 1. **Settings** → **Plugins** → **Marketplace**
-2. Search for **"SigMap"**
-3. Click **Install**
-4. Restart IDE
+2. Search **SigMap**
+3. Click **Install** → restart IDE
 
-### Manual Installation
+Or open the marketplace page directly:
+[plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
 
-1. Download the latest `sigmap-X.Y.Z.zip` from [Releases](https://github.com/manojmallick/sigmap/releases)
-2. **Settings** → **Plugins** → ⚙️ → **Install Plugin from Disk...**
-3. Select the downloaded ZIP file
-4. Restart IDE
+### Manual (.zip)
+
+1. Download `sigmap-X.Y.Z.zip` from [Releases](https://github.com/manojmallick/sigmap-jetbrains/releases)
+2. **Settings** → **Plugins** → ⚙️ → **Install Plugin from Disk…**
+3. Select the ZIP → restart IDE
+
+---
 
 ## Requirements
 
-- JetBrains IDE 2024.1 through 2026.1 (IntelliJ IDEA, WebStorm, PyCharm, etc.)
-- Node.js 18+ (for running gen-context.js)
-- `gen-context.js` in your project root (install via `npm install sigmap`)
+| Requirement | Details |
+|---|---|
+| **JetBrains IDE** | 2024.1 – 2026.1 (IDEA, WebStorm, PyCharm, GoLand, RubyMine, …) |
+| **Node.js** | 18 or higher |
+| **SigMap CLI** | `npm install -g sigmap` or `npx sigmap` |
+
+---
 
 ## Usage
 
-### Regenerate Context
+### Regenerate context
 
-**Method 1:** Status Bar
-- Click the "SigMap: X Xh" widget in the bottom status bar
+**Status bar** — click the `SigMap: X Xh` widget  
+**Keyboard** — `Ctrl+Alt+G` (Windows/Linux) / `Cmd+Alt+G` (macOS)  
+**Menu** — Tools → SigMap → Regenerate Context
 
-**Method 2:** Keyboard Shortcut
-- Press **Ctrl+Alt+G** (Windows/Linux) or **Cmd+Alt+G** (macOS)
+### CLI commands (terminal)
 
-**Method 3:** Tools Menu
-- **Tools** → **SigMap** → **Regenerate Context**
+```bash
+sigmap                   # generate once
+sigmap ask "auth flow"   # query-focused context
+sigmap validate          # check coverage
+sigmap judge             # score answer groundedness
+sigmap --watch           # auto-regenerate on save
+```
 
-### Health Grades
-
-| Grade | Age | Meaning |
-|---|---|---|
-| A | < 1 hour | Fresh context |
-| B | 1-6 hours | Good |
-| C | 6-12 hours | Aging |
-| D | 12-24 hours | Stale |
-| F | > 24 hours | Expired — regenerate ASAP |
-
-### Keyboard Shortcuts
-
-| Action | Windows/Linux | macOS |
-|---|---|---|
-| Regenerate Context | Ctrl+Alt+G | Cmd+Alt+G |
-| Open Context File | — | — |
-| View Roadmap | — | — |
+---
 
 ## Configuration
 
-Place `gen-context.config.json` in your project root to customize:
+Place `gen-context.config.json` in your project root:
 
 ```json
 {
   "srcDirs": ["src", "lib"],
-  "exclude": ["node_modules", ".git", "dist"],
+  "exclude": ["node_modules", "dist"],
   "maxTokens": 6000,
   "secretScan": true
 }
 ```
 
-See [Configuration Guide](https://manojmallick.github.io/sigmap/config.html) for all options.
+Full reference: [manojmallick.github.io/sigmap/guide/config](https://manojmallick.github.io/sigmap/guide/config)
 
-## CLI Quick Reference
+---
 
-Run these from a terminal in your project root:
+## Benchmark
 
-| Command | Description |
-|---|---|
-| `sigmap` | Generate context once |
-| `sigmap --watch` | Regenerate on file changes |
-| `sigmap --monorepo` | Per-package context (`packages/`, `apps/`, `services/`) |
-| `sigmap --each` | Process each sibling repo under a parent directory |
-| `sigmap --health` | Context health grade |
-| `sigmap --init` | Create starter config + `.contextignore` |
+| Metric | Value |
+|---|---:|
+| Retrieval hit@5 | **80.0%** vs 13.6% baseline |
+| Graph-boosted hit@5 | **83.3%** |
+| Overall token reduction | **96.9%** |
+| Prompt reduction | **40.8%** (2.84 → 1.68) |
+| Languages supported | **29** |
+
+---
 
 ## Troubleshooting
 
-### "gen-context.js not found"
+**"gen-context.js not found"**  
+→ `npm install -g sigmap` or `npm install sigmap` in your project root
 
-**Solution:** Install SigMap in your project:
-```bash
-npm install sigmap
-# or
-cp /path/to/sigmap/gen-context.js .
-```
+**Status bar not appearing**  
+→ Restart the IDE after installation
 
-### Context file not detected
+**Context file not detected**  
+→ The plugin looks for `.github/copilot-instructions.md`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules` — ensure at least one exists
 
-The plugin looks for these files in order:
-1. `.github/copilot-instructions.md`
-2. `CLAUDE.md`
-3. `.cursorrules`
-4. `.windsurfrules`
+---
 
-Ensure at least one exists.
+## Links
 
-### Plugin doesn't appear in Tools menu
+| | |
+|---|---|
+| 📖 Docs | [manojmallick.github.io/sigmap](https://manojmallick.github.io/sigmap/) |
+| 🔌 VS Code extension | [github.com/manojmallick/sigmap-vscode](https://github.com/manojmallick/sigmap-vscode) |
+| 🖥 CLI / core | [github.com/manojmallick/sigmap](https://github.com/manojmallick/sigmap) |
+| 🐛 Issues | [github.com/manojmallick/sigmap-jetbrains/issues](https://github.com/manojmallick/sigmap-jetbrains/issues) |
+| 📦 npm | [npmjs.com/package/sigmap](https://www.npmjs.com/package/sigmap) |
 
-**Solution:** Restart the IDE after installation.
+---
 
-## Support
+<div align="center">
 
-- [Documentation](https://manojmallick.github.io/sigmap/)
-- [GitHub Issues](https://github.com/manojmallick/sigmap/issues)
-- [Roadmap](https://manojmallick.github.io/sigmap/roadmap.html)
+MIT © 2026 [Manoj Mallick](https://github.com/manojmallick) · Made in Amsterdam 🇳🇱
 
-## License
-
-MIT — See [LICENSE](https://github.com/manojmallick/sigmap/blob/main/LICENSE)
+</div>
