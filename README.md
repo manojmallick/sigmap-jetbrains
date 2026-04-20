@@ -4,9 +4,9 @@
 
 ### AI context engine for IntelliJ IDEA, WebStorm, PyCharm, GoLand and all JetBrains IDEs
 
-[![JetBrains Marketplace](https://img.shields.io/jetbrains/plugin/v/26371-sigmap--ai-context-engine?label=JetBrains%20Marketplace&color=7c6af7&logo=jetbrains)](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/26371-sigmap--ai-context-engine?color=blue&logo=jetbrains)](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
-[![Rating](https://img.shields.io/jetbrains/plugin/r/rating/26371-sigmap--ai-context-engine?color=brightgreen)](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
+[![JetBrains Marketplace](https://img.shields.io/jetbrains/plugin/v/31109-sigmap--ai-context-engine?label=JetBrains%20Marketplace&color=7c6af7&logo=jetbrains)](https://plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/31109-sigmap--ai-context-engine?color=blue&logo=jetbrains)](https://plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine)
+[![Rating](https://img.shields.io/jetbrains/plugin/r/rating/31109-sigmap--ai-context-engine?color=brightgreen)](https://plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine)
 [![Release](https://img.shields.io/github/v/release/manojmallick/sigmap-jetbrains?color=7c6af7&label=release)](https://github.com/manojmallick/sigmap-jetbrains/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Node ≥18](https://img.shields.io/badge/node-%E2%89%A518-brightgreen?logo=node.js)](https://nodejs.org)
@@ -69,7 +69,7 @@ After SigMap:  "I can see your AuthService, UserRepository, 47 API routes…"
 3. Click **Install** → restart IDE
 
 Or open the marketplace page directly:
-[plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine](https://plugins.jetbrains.com/plugin/26371-sigmap--ai-context-engine)
+[plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine](https://plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine)
 
 ### Manual (.zip)
 
