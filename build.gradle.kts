@@ -5,11 +5,11 @@ plugins {
 }
 
 val ideSinceBuild = "241"
-val ideUntilBuild = "261.*"
+val ideUntilBuild = "262.*"
 val verifierIdeVersions = listOf("IC-241.19416.15", "IC-252.28539.33")
 
 group = "com.sigmap"
-version = "4.0.1"
+version = "4.1.0"
 
 repositories {
     mavenCentral()
@@ -42,6 +42,13 @@ tasks {
         untilBuild.set(ideUntilBuild)
         changeNotes.set(
             """
+            <h3>4.1.0</h3>
+            <ul>
+              <li>IDE compatibility extended to 2026.2 (until-build 262.*).</li>
+              <li>Windows: the status-bar health probe now uses the same cross-platform command resolution as Regenerate (previously fell back to a file-age grade).</li>
+              <li>The health probe runs only when the context file changes (or every 10 minutes) instead of every 60 seconds, and is bounded by a 30-second timeout; regeneration is now cancellable with a 5-minute cap.</li>
+              <li>The status bar refreshes immediately after a successful regeneration.</li>
+            </ul>
             <h3>4.0.1</h3>
             <ul>
               <li>Fixed both Plugin Verifier warnings: the stale-context notification's Regenerate button now fires the action via <code>ActionManager.tryToExecute(...)</code> instead of calling <code>actionPerformed</code> directly with a deprecated <code>createFromDataContext</code> event.</li>

@@ -10,6 +10,26 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [4.1.0] — 2026-07-28
+
+Minor release — IDE compatibility through 2026.2, Windows health-probe fix, bounded external processes, and instant status-bar refresh after regeneration.
+
+### Added
+- **Instant status refresh (#4):** `RegenerateAction` publishes a `SigMapContextListener.TOPIC` message-bus event on success; the status-bar widget subscribes and re-probes immediately instead of waiting up to 60 s for the next tick.
+- **`GenContextLocator` (#4):** the full cross-platform command resolution (local `gen-context.js`, `node_modules/.bin`, Volta/nvm/Homebrew/npm-global paths, PATH, login-shell fallback, Windows `where`/`.cmd`/`.exe` candidates) extracted from `RegenerateAction` into one shared object with a per-project cache — successful resolutions are reused, dropped when their files disappear, and failures are never cached.
+
+### Changed
+- **IDE compatibility extended to 2026.2** — `until-build` raised `261.*` → `262.*` (the build line the Marketplace verifier already checks against).
+- **Actions declare `ActionUpdateThread.BGT`** — removes the deprecated implicit `OLD_EDT` update-thread default.
+- **Health probe throttled (#4):** the status bar spawned `which node` + `gen-context --health --json` every 60 s per project; it now runs the CLI only when the context file's mtime changes or the last probe is ≥ 10 min old, recomputing just the age display locally in between.
+- **External processes bounded (#4):** the health probe times out after 30 s (`destroyForcibly`), and regeneration is now a cancellable background task with a 5-minute cap.
+
+### Fixed
+- **Windows health probe (#4):** the status bar's private resolver shelled out to `which node` (nonexistent on Windows), silently degrading every Windows install to the mtime-only grade — it now uses the shared `GenContextLocator`.
+- **Widget disposal no longer blocks (#4):** `dispose()` used `awaitTermination(5 s)`, which could stall project close; now `shutdownNow()`.
+
+---
+
 ## [4.0.1] — 2026-07-27
 
 Patch release — fixes both warnings from the JetBrains Marketplace Plugin Verifier (reported against IntelliJ IDEA 2026.2.1 EAP).

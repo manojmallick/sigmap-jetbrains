@@ -31,11 +31,23 @@ data class HealthResult(
 
 class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarWidget.TextPresentation, Disposable {
 
+    companion object {
+        // The CLI probe spawns a node process — run it only when the context file
+        // changed or the last probe is stale; ticks in between just refresh the age.
+        private const val PROBE_INTERVAL_MS = 10 * 60 * 1000L
+        private const val HEALTH_TIMEOUT_SECONDS = 30L
+        private const val DAY_MS = 86_400_000.0
+    }
+
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private var healthText = "SigMap: --"
     private var toolTipText = "SigMap context health — Click to regenerate"
     // Feature 4: track whether the 24h stale popup has already been shown this session
     private var staleNotificationShown = false
+    // Last CLI probe result, reused between probes (only the age is recomputed locally)
+    private var lastHealth: HealthResult? = null
+    private var lastProbeAtMs = 0L
+    private var lastMtimeMs = -1L
 
     init {
         // Update every 60 seconds
@@ -45,6 +57,12 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
             60,
             TimeUnit.SECONDS,
         )
+        // Refresh immediately when a regeneration completes
+        project.messageBus.connect(this).subscribe(SigMapContextListener.TOPIC, object : SigMapContextListener {
+            override fun contextRegenerated() {
+                executor.execute { updateHealthStatus(force = true) }
+            }
+        })
     }
 
     override fun ID(): String = "sigmap.healthStatusBar"
@@ -62,23 +80,36 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
         }
     }
 
-    private fun updateHealthStatus() {
+    private fun updateHealthStatus(force: Boolean = false) {
         val projectPath = project.basePath ?: return
         val contextFile = File(projectPath, ".github/copilot-instructions.md")
 
         if (!contextFile.exists()) {
+            lastHealth = null
             healthText = "SigMap: ⚠ missing"
             toolTipText = "SigMap: no context file found — click to regenerate"
             myStatusBar?.updateWidget(ID())
             return
         }
 
-        // Feature 5: prefer --health --json for rich grade + token data
-        val health = fetchHealth(projectPath) ?: run {
-            // Fallback: compute grade from mtime only
-            val lastModified = Files.getLastModifiedTime(contextFile.toPath())
-            val age = getAge(lastModified)
-            HealthResult(grade = computeGrade(age), score = 0, daysSince = age.toMillis() / 86_400_000.0)
+        val mtimeMs = Files.getLastModifiedTime(contextFile.toPath()).toMillis()
+        val nowMs = System.currentTimeMillis()
+        val needProbe = force || lastHealth == null || mtimeMs != lastMtimeMs ||
+            nowMs - lastProbeAtMs >= PROBE_INTERVAL_MS
+
+        val health = if (needProbe) {
+            // Feature 5: prefer --health --json for rich grade + token data
+            val probed = fetchHealth(projectPath) ?: run {
+                // Fallback: compute grade from mtime only
+                val age = getAge(FileTime.fromMillis(mtimeMs))
+                HealthResult(grade = computeGrade(age), score = 0, daysSince = age.toMillis() / DAY_MS)
+            }
+            lastHealth = probed
+            lastProbeAtMs = nowMs
+            lastMtimeMs = mtimeMs
+            probed
+        } else {
+            lastHealth!!.copy(daysSince = (nowMs - mtimeMs) / DAY_MS)
         }
 
         val tokStr = if (health.tokens > 0) " · ${health.tokens} tok" else ""
@@ -105,33 +136,18 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
         if (health.daysSince < 1.0) staleNotificationShown = false
     }
 
-    // Feature 5: call `gen-context --health --json` and parse the result
-    private fun findGenContextCommand(projectPath: String): Pair<String, List<String>>? {
-        val candidates = listOf(
-            File(projectPath, "gen-context.js"),
-            File(projectPath, "node_modules/.bin/sigmap"),
-            File(projectPath, "node_modules/.bin/sigmap.cmd"),
-        )
-        for (f in candidates) {
-            if (f.exists()) {
-                val node = ProcessBuilder("which", "node").start().inputStream.bufferedReader().readText().trim()
-                    .ifEmpty { "node" }
-                return if (f.name.endsWith(".js")) Pair(node, listOf(f.absolutePath))
-                else Pair(f.absolutePath, emptyList())
-            }
-        }
-        return null
-    }
-
     private fun fetchHealth(projectPath: String): HealthResult? {
         return try {
-            val (exe, params) = findGenContextCommand(projectPath) ?: return null
-            val cmd = mutableListOf(exe) + params + listOf("--health", "--json")
-            val out = ProcessBuilder(cmd)
+            val command = GenContextLocator.resolve(projectPath) ?: return null
+            val proc = ProcessBuilder(listOf(command.exe) + command.params + listOf("--health", "--json"))
                 .directory(File(projectPath))
                 .redirectErrorStream(true)
                 .start()
-                .inputStream.bufferedReader().readText()
+            if (!proc.waitFor(HEALTH_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                proc.destroyForcibly()
+                return null
+            }
+            val out = proc.inputStream.bufferedReader().readText()
             val grade     = Regex(""""grade"\s*:\s*"([A-F?])"""").find(out)?.groupValues?.get(1) ?: "?"
             val score     = Regex(""""score"\s*:\s*(\d+)""").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
             val days      = Regex(""""daysSinceRegen"\s*:\s*([\d.]+)""").find(out)?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
@@ -189,11 +205,6 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
     override fun getAlignment(): Float = 1f  // Right-align in status bar
 
     override fun dispose() {
-        executor.shutdown()
-        try {
-            executor.awaitTermination(5, TimeUnit.SECONDS)
-        } catch (e: InterruptedException) {
-            executor.shutdownNow()
-        }
+        executor.shutdownNow()
     }
 }
