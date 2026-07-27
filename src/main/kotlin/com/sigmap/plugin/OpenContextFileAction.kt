@@ -1,5 +1,6 @@
 package com.sigmap.plugin
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -40,6 +41,8 @@ class OpenContextFileAction : AnAction() {
         FileEditorManager.getInstance(project).openFile(virtualFile, true)
     }
     
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
     override fun update(e: AnActionEvent) {
         e.presentation.isEnabled = e.project != null
     }

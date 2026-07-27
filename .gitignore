@@ -10,6 +10,7 @@ build/
 *.ipr
 *.iws
 out/
+bin/*
 
 # macOS
 .DS_Store
