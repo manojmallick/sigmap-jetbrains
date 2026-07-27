@@ -92,7 +92,7 @@ jobs:
           body: |
             JetBrains plugin release `${{ github.ref_name }}`.
 
-            Install from the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/26371-sigmap).
+            Install from the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/31109-sigmap--ai-context-engine).
 
             The `.zip` file below can be installed manually via **Settings → Plugins → ⚙ → Install Plugin from Disk…**
           files: dist/*.zip
