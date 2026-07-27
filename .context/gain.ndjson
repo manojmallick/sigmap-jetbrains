@@ -1,0 +1,2 @@
+{"ts":"2026-07-27T21:27:22.191Z","v":"8.18.0","op":"generate","baselineTokens":9541,"actualTokens":753,"savedTokens":8788,"savedPct":92.1,"durationMs":927,"model":null,"ok":true}
+{"ts":"2026-07-27T22:17:50.534Z","v":"8.18.0","op":"generate","baselineTokens":10215,"actualTokens":945,"savedTokens":9270,"savedPct":90.7,"durationMs":732,"model":null,"ok":true}
