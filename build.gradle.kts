@@ -9,7 +9,7 @@ val ideUntilBuild = "261.*"
 val verifierIdeVersions = listOf("IC-241.19416.15", "IC-252.28539.33")
 
 group = "com.sigmap"
-version = "4.0.0"
+version = "4.0.1"
 
 repositories {
     mavenCentral()
@@ -40,6 +40,18 @@ tasks {
     patchPluginXml {
         sinceBuild.set(ideSinceBuild)
         untilBuild.set(ideUntilBuild)
+        changeNotes.set(
+            """
+            <h3>4.0.1</h3>
+            <ul>
+              <li>Fixed both Plugin Verifier warnings: the stale-context notification's Regenerate button now fires the action via <code>ActionManager.tryToExecute(...)</code> instead of calling <code>actionPerformed</code> directly with a deprecated <code>createFromDataContext</code> event.</li>
+            </ul>
+            <h3>4.0.0</h3>
+            <ul>
+              <li>First standalone release — health status bar, one-click regenerate, stale-context notification, auto-refresh.</li>
+            </ul>
+            """.trimIndent()
+        )
     }
 
     runPluginVerifier {

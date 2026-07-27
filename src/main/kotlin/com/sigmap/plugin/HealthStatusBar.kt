@@ -5,8 +5,6 @@ import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
@@ -152,8 +150,9 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
             NotificationType.WARNING,
         )
         n.addAction(NotificationAction.createSimple("Regenerate") {
-            ActionManager.getInstance().getAction("SigMap.RegenerateContext")
-                ?.actionPerformed(AnActionEvent.createFromDataContext("", null, DataContext.EMPTY_CONTEXT))
+            ActionManager.getInstance().getAction("SigMap.RegenerateContext")?.let { action ->
+                ActionManager.getInstance().tryToExecute(action, null, null, "SigMapStaleNotification", true)
+            }
             n.expire()
         })
         n.addAction(NotificationAction.createSimple("Dismiss") { n.expire() })
