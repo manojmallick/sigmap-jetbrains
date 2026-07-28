@@ -49,7 +49,8 @@ jobs:
 
       - name: Build and verify plugin
         run: |
-          ./gradlew buildPlugin verifyPlugin runPluginVerifier
+          # 2.x: verifyPlugin runs the IntelliJ Plugin Verifier (1.x runPluginVerifier is gone)
+          ./gradlew buildPlugin verifyPlugin
           echo "✓ Plugin built and verified successfully"
 
       - name: Publish plugin to JetBrains Marketplace
