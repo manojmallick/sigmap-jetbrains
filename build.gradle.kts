@@ -10,7 +10,7 @@ val ideSinceBuild = "241"
 val ideUntilBuild = "262.*"
 
 group = "com.sigmap"
-version = "4.3.0"
+version = "4.3.1"
 
 repositories {
     mavenCentral()
@@ -39,6 +39,10 @@ intellijPlatform {
             untilBuild = ideUntilBuild
         }
         changeNotes = """
+            <h3>4.3.1</h3>
+            <ul>
+              <li>Fixed the status bar showing "SigMap: ?" on GUI-launched IDEs: the health probe (and Ask queries) now run with the login-shell environment so node resolves, and a failed probe falls back to the age-based A–F grade instead of "?".</li>
+            </ul>
             <h3>4.3.0</h3>
             <ul>
               <li>SigMap Ask tool window: type a natural-language question, get ranked files with signature previews, double-click to open — the retrieval half of SigMap, now inside the IDE.</li>

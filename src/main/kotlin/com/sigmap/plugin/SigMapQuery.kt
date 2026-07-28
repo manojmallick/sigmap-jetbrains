@@ -1,7 +1,6 @@
 package com.sigmap.plugin
 
 import com.google.gson.JsonParser
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 /** One ranked file from `--query <text> --json`. */
@@ -46,13 +45,12 @@ object SigMapQuery {
     /** Blocking, bounded query. Returns [] on any failure. */
     fun run(projectPath: String, command: GenContextLocator.Command, text: String, top: Int = DEFAULT_TOP): List<QueryResult> {
         return try {
-            val proc = ProcessBuilder(buildArgs(command, text, top))
-                .directory(File(projectPath))
-                .start()
+            val proc = SigMapProcess.start(command, listOf("--query", text, "--json", "--top", top.toString()), projectPath)
             if (!proc.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 proc.destroyForcibly()
                 return emptyList()
             }
+            if (proc.exitValue() != 0) return emptyList()
             parseResults(proc.inputStream.bufferedReader().readText())
         } catch (_: Exception) {
             emptyList()
