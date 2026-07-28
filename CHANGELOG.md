@@ -8,8 +8,20 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+---
+
+## [4.2.0] — 2026-07-28
+
+Minor release — settings page, richer status-bar menu, Open Context File feedback, refreshed listing, and the Gradle Plugin 2.x build migration.
+
+### Added
+- **Settings page (#8):** Tools → SigMap — explicit CLI path override (a `.js` path runs through node) and health-probe cadence in minutes. Project-level, persisted to `.idea/sigmap.xml`, takes effect without restart.
+- **Status-bar action menu (#8):** the widget now uses `MultipleTextValuesPresentation` — clicking opens a popup with Regenerate / Open Context File / View Roadmap instead of hardwiring Regenerate.
+- **Open Context File feedback (#8):** when no context file exists (including the CLAUDE.md / .cursorrules / .windsurfrules fallbacks), a notification with a "Generate now" action appears instead of silently doing nothing.
+
 ### Changed
 - **Build migrated to the IntelliJ Platform Gradle Plugin 2.18.1 (#6):** replaces end-of-life `org.jetbrains.intellij` 1.17.4. Gradle wrapper 8.5 → 9.6.1, Kotlin 2.2.20, verifier now runs via `verifyPlugin` (release workflow updated). The plugin zip no longer bundles kotlin-stdlib (platform provides it) — 1.7 MB → 37 KB.
+- **Marketplace listing refreshed (#8):** 21 → 33 languages, "97%" → 96.8% average token reduction, settings + menu documented.
 
 ---
 

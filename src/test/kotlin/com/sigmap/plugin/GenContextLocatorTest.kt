@@ -119,6 +119,34 @@ class GenContextLocatorTest {
     }
 
     @Test
+    fun testFromOverrideBlankAndMissingPathsReturnNull() {
+        assertNull(GenContextLocator.fromOverride(null))
+        assertNull(GenContextLocator.fromOverride("   "))
+        assertNull(GenContextLocator.fromOverride(File(testProjectDir, "does-not-exist").absolutePath))
+    }
+
+    @Test
+    fun testFromOverrideScriptRunsThroughNode() {
+        val script = File(testProjectDir, "custom-gen-context.js")
+        script.writeText("console.log('x')")
+        val cmd = GenContextLocator.fromOverride(script.absolutePath)
+        assertNotNull(cmd)
+        assertTrue(cmd.exe.endsWith("node") || cmd.exe.endsWith("node.exe"))
+        assertEquals(script.absolutePath, cmd.params.firstOrNull())
+    }
+
+    @Test
+    fun testFromOverrideBinaryRunsDirectly() {
+        val bin = File(testProjectDir, "sigmap")
+        bin.writeText("#!/bin/sh\necho x")
+        bin.setExecutable(true)
+        val cmd = GenContextLocator.fromOverride(bin.absolutePath)
+        assertNotNull(cmd)
+        assertEquals(bin.absolutePath, cmd.exe)
+        assertTrue(cmd.params.isEmpty())
+    }
+
+    @Test
     fun testFindCommandInPathValidCommand() {
         // Try to find a common system command that should exist on Unix-like systems
         val result = findCommandInPathReflection("ls")

@@ -31,7 +31,8 @@ class RegenerateAction : AnAction() {
                 try {
                     val projectPath = project.basePath ?: return
 
-                    val command = GenContextLocator.resolve(projectPath)
+                    val command = GenContextLocator.fromOverride(SigMapSettings.getInstance(project).cliPath)
+                        ?: GenContextLocator.resolve(projectPath)
                         ?: run {
                             showNotification(
                                 project,

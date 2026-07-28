@@ -1,16 +1,21 @@
 package com.sigmap.plugin
 
+import com.intellij.ide.DataManager
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
+import java.awt.Point
 import java.awt.event.MouseEvent
 import java.io.File
 import java.nio.file.Files
@@ -32,12 +37,15 @@ data class HealthResult(
 class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarWidget.TextPresentation, Disposable {
 
     companion object {
-        // The CLI probe spawns a node process — run it only when the context file
-        // changed or the last probe is stale; ticks in between just refresh the age.
-        private const val PROBE_INTERVAL_MS = 10 * 60 * 1000L
         private const val HEALTH_TIMEOUT_SECONDS = 30L
         private const val DAY_MS = 86_400_000.0
     }
+
+    // The CLI probe spawns a node process — run it only when the context file
+    // changed or the last probe is stale; ticks in between just refresh the age.
+    // Cadence is user-configurable (Tools → SigMap).
+    private fun probeIntervalMs(): Long =
+        SigMapSettings.getInstance(project).probeIntervalMinutes.coerceAtLeast(1) * 60_000L
 
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private var healthText = "SigMap: --"
@@ -73,10 +81,27 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
 
     override fun getTooltipText(): String = toolTipText
 
+    override fun getAlignment(): Float = 1f  // Right-align in status bar
+
+    // Click opens a popup with all SigMap actions instead of hardwiring Regenerate.
     override fun getClickConsumer(): Consumer<MouseEvent>? {
-        return Consumer {
-            val action = ActionManager.getInstance().getAction("SigMap.RegenerateContext") ?: return@Consumer
-            ActionManager.getInstance().tryToExecute(action, it, null, "SigMapHealthStatusBar", true)
+        return Consumer { e ->
+            val am = ActionManager.getInstance()
+            val group = DefaultActionGroup().apply {
+                am.getAction("SigMap.RegenerateContext")?.let(::add)
+                am.getAction("SigMap.OpenContextFile")?.let(::add)
+                am.getAction("SigMap.ViewRoadmap")?.let(::add)
+            }
+            if (group.childrenCount == 0) return@Consumer
+            val popup = JBPopupFactory.getInstance().createActionGroupPopup(
+                "SigMap",
+                group,
+                DataManager.getInstance().getDataContext(e.component),
+                JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+                true,
+            )
+            val size = popup.content.preferredSize
+            popup.show(RelativePoint(e.component, Point(0, -size.height)))
         }
     }
 
@@ -95,7 +120,7 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
         val mtimeMs = Files.getLastModifiedTime(contextFile.toPath()).toMillis()
         val nowMs = System.currentTimeMillis()
         val needProbe = force || lastHealth == null || mtimeMs != lastMtimeMs ||
-            nowMs - lastProbeAtMs >= PROBE_INTERVAL_MS
+            nowMs - lastProbeAtMs >= probeIntervalMs()
 
         val health = if (needProbe) {
             // Feature 5: prefer --health --json for rich grade + token data
@@ -138,7 +163,8 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
 
     private fun fetchHealth(projectPath: String): HealthResult? {
         return try {
-            val command = GenContextLocator.resolve(projectPath) ?: return null
+            val command = GenContextLocator.fromOverride(SigMapSettings.getInstance(project).cliPath)
+                ?: GenContextLocator.resolve(projectPath) ?: return null
             val proc = ProcessBuilder(listOf(command.exe) + command.params + listOf("--health", "--json"))
                 .directory(File(projectPath))
                 .redirectErrorStream(true)
@@ -201,8 +227,6 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
             else        -> "${minutes}m"
         }
     }
-
-    override fun getAlignment(): Float = 1f  // Right-align in status bar
 
     override fun dispose() {
         executor.shutdownNow()
