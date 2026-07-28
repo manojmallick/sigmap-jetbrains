@@ -10,7 +10,7 @@ val ideSinceBuild = "241"
 val ideUntilBuild = "262.*"
 
 group = "com.sigmap"
-version = "4.2.0"
+version = "4.3.0"
 
 repositories {
     mavenCentral()
@@ -39,6 +39,10 @@ intellijPlatform {
             untilBuild = ideUntilBuild
         }
         changeNotes = """
+            <h3>4.3.0</h3>
+            <ul>
+              <li>SigMap Ask tool window: type a natural-language question, get ranked files with signature previews, double-click to open — the retrieval half of SigMap, now inside the IDE.</li>
+            </ul>
             <h3>4.2.0</h3>
             <ul>
               <li>Settings page (Tools → SigMap): explicit CLI path override and health-probe cadence.</li>
@@ -89,6 +93,14 @@ tasks {
     }
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            // Use true JVM default methods instead of DefaultImpls bridges —
+            // otherwise classes implementing platform Kotlin interfaces
+            // (ToolWindowFactory etc.) get generated overrides of every
+            // inherited default, which the Plugin Verifier flags as
+            // deprecated/internal API usage.
+            freeCompilerArgs.add("-Xjvm-default=all")
+        }
     }
 }

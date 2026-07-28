@@ -10,6 +10,15 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [4.3.0] — 2026-07-28
+
+Minor release — the retrieval half of SigMap arrives in the IDE.
+
+### Added
+- **SigMap Ask tool window (#10):** right-anchored panel — type a natural-language question (Enter to run), get ranked files with score and first-signature preview via `--query <text> --json`, double-click to open. Respects the Tools → SigMap CLI path override; the query runs on a pooled thread with a 15 s bound; missing CLI and empty results surface as status-line messages, never exceptions. New `SigMapQuery` module (args building + JSON parsing) is unit-tested.
+
+---
+
 ## [4.2.0] — 2026-07-28
 
 Minor release — settings page, richer status-bar menu, Open Context File feedback, refreshed listing, and the Gradle Plugin 2.x build migration.

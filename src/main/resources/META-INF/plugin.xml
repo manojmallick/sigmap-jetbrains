@@ -32,6 +32,10 @@
                              instance="com.sigmap.plugin.SigMapConfigurable"
                              id="com.sigmap.plugin.settings"
                              displayName="SigMap"/>
+        <toolWindow id="SigMap"
+                    anchor="right"
+                    factoryClass="com.sigmap.plugin.SigMapToolWindowFactory"
+                    icon="AllIcons.Actions.Search"/>
     </extensions>
 
     <actions>
