@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Node ≥18](https://img.shields.io/badge/node-%E2%89%A518-brightgreen?logo=node.js)](https://nodejs.org)
 
-**80.0% retrieval hit@5 · 96.9% token reduction · 29 languages · Zero npm deps**
+**85.6% retrieval hit@5 · 96.8% token reduction · 33 languages · Zero npm deps**
 
 </div>
 
@@ -30,11 +30,13 @@ After SigMap:  "I can see your AuthService, UserRepository, 47 API routes…"
 
 ---
 
-## What's new in v4.0
+## What's new in v4.1–v4.3
 
-- Standalone release — independent version cycle from the SigMap CLI core
-- Compatible with SigMap CLI v6.0 (graph-boosted retrieval, incremental cache)
-- Updated IDE compatibility: IntelliJ 2024.1 → 2026.1
+- **SigMap Ask tool window** (v4.3) — type a natural-language question, get ranked files with signature previews, double-click to open
+- **Settings page** (v4.2) — Tools → SigMap: explicit CLI path override, health-probe cadence
+- **Status-bar action menu** (v4.2) — click the widget for Regenerate / Open Context File / View Roadmap
+- **Hardened core loop** (v4.1) — cached cross-platform command resolution (Windows fixed), throttled health probes, bounded processes, instant status refresh after regeneration
+- IDE compatibility extended through **2026.2**; compatible with SigMap CLI v8.x (33 languages, 20 MCP tools)
 
 ---
 
@@ -42,11 +44,13 @@ After SigMap:  "I can see your AuthService, UserRepository, 47 API routes…"
 
 | Feature | Description |
 |---|---|
-| **Health Status Bar** | Live grade A–F + age (`SigMap: B 3h`) in the bottom status bar |
-| **Regenerate Context** | Tools → SigMap → Regenerate Context or `Ctrl+Alt+G` |
-| **Open Context File** | One click to open `.github/copilot-instructions.md` |
+| **Health Status Bar** | Live grade A–F, tokens, reduction + age (`SigMap: B · 945 tok · 91% ↓`); click for the action menu |
+| **SigMap Ask tool window** | Ask a question → ranked files with signature previews → double-click to open |
+| **Regenerate Context** | Tools → SigMap → Regenerate Context or `Ctrl+Alt+G` — cancellable, instant status refresh |
+| **Open Context File** | One click to open `.github/copilot-instructions.md` (offers to generate when missing) |
+| **Settings** | Tools → SigMap: explicit CLI path override, health-probe cadence |
 | **View Roadmap** | Opens the SigMap docs in your browser |
-| **Auto-refresh** | Status re-checks every 60 seconds |
+| **Auto-refresh** | Age updates every 60 s; the CLI health probe runs only on context change (or per your configured cadence) |
 
 ### Health grades
 
@@ -83,7 +87,7 @@ Or open the marketplace page directly:
 
 | Requirement | Details |
 |---|---|
-| **JetBrains IDE** | 2024.1 – 2026.1 (IDEA, WebStorm, PyCharm, GoLand, RubyMine, …) |
+| **JetBrains IDE** | 2024.1 – 2026.2 (IDEA, WebStorm, PyCharm, GoLand, RubyMine, …) |
 | **Node.js** | 18 or higher |
 | **SigMap CLI** | `npm install -g sigmap` or `npx sigmap` |
 
@@ -93,7 +97,7 @@ Or open the marketplace page directly:
 
 ### Regenerate context
 
-**Status bar** — click the `SigMap: X Xh` widget  
+**Status bar** — click the `SigMap: X` widget → **Regenerate Context**  
 **Keyboard** — `Ctrl+Alt+G` (Windows/Linux) / `Cmd+Alt+G` (macOS)  
 **Menu** — Tools → SigMap → Regenerate Context
 
@@ -130,11 +134,13 @@ Full reference: [manojmallick.github.io/sigmap/guide/config](https://manojmallic
 
 | Metric | Value |
 |---|---:|
-| Retrieval hit@5 | **80.0%** vs 13.6% baseline |
-| Graph-boosted hit@5 | **83.3%** |
-| Overall token reduction | **96.9%** |
-| Prompt reduction | **40.8%** (2.84 → 1.68) |
-| Languages supported | **29** |
+| Retrieval hit@5 | **85.6%** vs 13.6% random baseline (6.3×) |
+| Honest grep-agent baseline | 42.7% → **85.6%** (2.0× lift) |
+| Overall token reduction | **96.8%** (avg across 18 real repos) |
+| Prompt reduction | **48%** (2.84 → 1.48 prompts/task) |
+| Languages supported | **33** |
+
+Benchmark ID: `sigmap-v8.21-main` · Date: 2026-07-19
 
 ---
 
