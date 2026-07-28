@@ -5,19 +5,20 @@
     <vendor email="support@sigmap.dev" url="https://github.com/manojmallick/sigmap">SigMap</vendor>
 
     <description><![CDATA[
-    <h2>SigMap — 97% Token Reduction for AI Coding Assistants</h2>
-    
-    <p>Zero-dependency AI context engine that extracts code signatures from 21 languages and generates compact context files for GitHub Copilot, Claude, Cursor, and other AI assistants.</p>
-    
+    <h2>SigMap — 96.8% Average Token Reduction for AI Coding Assistants</h2>
+
+    <p>Zero-dependency AI context engine that extracts code signatures from 33 languages and generates compact context files for GitHub Copilot, Claude, Cursor, and other AI assistants.</p>
+
     <h3>Features</h3>
     <ul>
       <li><strong>Automatic Context Generation</strong> — Extracts function signatures, class definitions, and type information</li>
-      <li><strong>Health Status Bar</strong> — Shows context health grade (A-F) and time since last regeneration</li>
+      <li><strong>Health Status Bar</strong> — Shows context health grade (A-F), token count, and age; click for the SigMap action menu</li>
       <li><strong>Toolbar Actions</strong> — Regenerate context, open context file, view roadmap with one click</li>
       <li><strong>Stale Context Alerts</strong> — Notifies when context is over 24 hours old</li>
-      <li><strong>21 Language Support</strong> — TypeScript, JavaScript, Python, Java, Kotlin, Go, Rust, C++, C#, Ruby, PHP, Swift, Dart, Scala, Vue, Svelte, HTML, CSS, YAML, Shell, Dockerfile</li>
+      <li><strong>Settings</strong> — Tools → SigMap: explicit CLI path override, health-probe cadence</li>
+      <li><strong>33 Language Support</strong> — TypeScript, JavaScript, Python, Java, Kotlin, Go, Rust, C++, C#, Ruby, PHP, Swift, Dart, Scala, SQL, GraphQL, Terraform, Protobuf, Vue, Svelte, HTML, CSS, YAML, TOML, Shell, Dockerfile, and more</li>
     </ul>
-    
+
     <p>Learn more at <a href="https://manojmallick.github.io/sigmap/">manojmallick.github.io/sigmap/</a></p>
     ]]></description>
 
@@ -27,6 +28,10 @@
         <statusBarWidgetFactory implementation="com.sigmap.plugin.HealthStatusBarFactory" id="sigmap.healthStatusBar"/>
         <!-- Feature 4: notification group for stale context popup -->
         <notificationGroup id="SigMap" displayType="BALLOON" isLogByDefault="false"/>
+        <projectConfigurable parentId="tools"
+                             instance="com.sigmap.plugin.SigMapConfigurable"
+                             id="com.sigmap.plugin.settings"
+                             displayName="SigMap"/>
     </extensions>
 
     <actions>

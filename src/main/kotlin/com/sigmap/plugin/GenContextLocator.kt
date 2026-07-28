@@ -26,6 +26,20 @@ object GenContextLocator {
         return doResolve(projectPath)?.also { cache[projectPath] = it }
     }
 
+    /**
+     * Build a Command from an explicit user-configured path (settings override).
+     * Returns null for blank or nonexistent paths so callers can fall back to
+     * auto-resolution. A `.js` path runs through node; anything else runs directly.
+     */
+    fun fromOverride(overridePath: String?): Command? {
+        val p = overridePath?.trim().orEmpty()
+        if (p.isEmpty()) return null
+        val f = File(p)
+        if (!f.exists() || !f.isFile) return null
+        return if (p.endsWith(".js")) Command(findNodeExecutable(), listOf(f.absolutePath))
+        else Command(f.absolutePath, emptyList())
+    }
+
     // The exe may be a bare command like "node" (resolved by the OS); only
     // absolute paths can be existence-checked. Params are always file paths.
     private fun stillValid(c: Command): Boolean =

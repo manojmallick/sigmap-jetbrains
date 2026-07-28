@@ -10,7 +10,7 @@ val ideSinceBuild = "241"
 val ideUntilBuild = "262.*"
 
 group = "com.sigmap"
-version = "4.1.0"
+version = "4.2.0"
 
 repositories {
     mavenCentral()
@@ -39,6 +39,13 @@ intellijPlatform {
             untilBuild = ideUntilBuild
         }
         changeNotes = """
+            <h3>4.2.0</h3>
+            <ul>
+              <li>Settings page (Tools → SigMap): explicit CLI path override and health-probe cadence.</li>
+              <li>Status-bar click now opens a menu with Regenerate / Open Context File / View Roadmap.</li>
+              <li>Open Context File shows a notification with a Generate action when no context file exists.</li>
+              <li>Listing refreshed: 33 languages, 96.8% average token reduction.</li>
+            </ul>
             <h3>4.1.0</h3>
             <ul>
               <li>IDE compatibility extended to 2026.2 (until-build 262.*).</li>
