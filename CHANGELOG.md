@@ -8,6 +8,9 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### Changed
+- **Build migrated to the IntelliJ Platform Gradle Plugin 2.18.1 (#6):** replaces end-of-life `org.jetbrains.intellij` 1.17.4. Gradle wrapper 8.5 → 9.6.1, Kotlin 2.2.20, verifier now runs via `verifyPlugin` (release workflow updated). The plugin zip no longer bundles kotlin-stdlib (platform provides it) — 1.7 MB → 37 KB.
+
 ---
 
 ## [4.1.0] — 2026-07-28
