@@ -165,16 +165,15 @@ class HealthStatusBar(project: Project) : EditorBasedWidget(project), StatusBarW
         return try {
             val command = GenContextLocator.fromOverride(SigMapSettings.getInstance(project).cliPath)
                 ?: GenContextLocator.resolve(projectPath) ?: return null
-            val proc = ProcessBuilder(listOf(command.exe) + command.params + listOf("--health", "--json"))
-                .directory(File(projectPath))
-                .redirectErrorStream(true)
-                .start()
+            val proc = SigMapProcess.start(command, listOf("--health", "--json"), projectPath)
             if (!proc.waitFor(HEALTH_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 proc.destroyForcibly()
                 return null
             }
+            // A failed probe must fall back to the mtime grade, not render "?".
+            if (proc.exitValue() != 0) return null
             val out = proc.inputStream.bufferedReader().readText()
-            val grade     = Regex(""""grade"\s*:\s*"([A-F?])"""").find(out)?.groupValues?.get(1) ?: "?"
+            val grade = Regex(""""grade"\s*:\s*"([A-F])"""").find(out)?.groupValues?.get(1) ?: return null
             val score     = Regex(""""score"\s*:\s*(\d+)""").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
             val days      = Regex(""""daysSinceRegen"\s*:\s*([\d.]+)""").find(out)?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
             val tokens    = Regex(""""tokens"\s*:\s*(\d+)""").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0

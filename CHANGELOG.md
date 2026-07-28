@@ -10,6 +10,16 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [4.3.1] — 2026-07-28
+
+Patch release — fixes the status bar showing `SigMap: ?` instead of a real grade.
+
+### Fixed
+- **Health probe environment (#14):** `fetchHealth` and `SigMapQuery.run` spawned via bare `ProcessBuilder`, inheriting the GUI-app environment — on macOS `node` is not on that PATH, so the `node_modules/.bin/sigmap` shim died with `env: node: No such file or directory`. Both now spawn through the new `SigMapProcess` helper (`GeneralCommandLine` + `ParentEnvironmentType.CONSOLE`, the same login-shell environment Regenerate already used).
+- **No more `?` grade (#14):** a probe that exits non-zero or produces no parseable grade now returns null — falling back to the age-based A–F grade — instead of rendering `?` with a fabricated result.
+
+---
+
 ## [4.3.0] — 2026-07-28
 
 Minor release — the retrieval half of SigMap arrives in the IDE.
