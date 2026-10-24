@@ -157,6 +157,36 @@ Benchmark ID: `sigmap-v8.21-main` · Date: 2026-07-19
 
 ---
 
+## Development
+
+Requires JDK 17. The project uses Kotlin and the IntelliJ Platform Gradle plugin.
+
+```bash
+./gradlew runIde           # start a sandbox IDE with the plugin loaded
+./gradlew test             # run the unit tests
+./gradlew buildPlugin      # build the installable zip into build/distributions/
+./gradlew verifyPlugin     # check compatibility against the supported IDE range
+```
+
+Source layout (`src/main/kotlin/com/sigmap/plugin/`):
+
+| File | Role |
+|---|---|
+| `HealthStatusBar.kt`, `HealthStatusBarFactory.kt` | Status-bar widget showing the grade, tokens and age |
+| `SigMapProcess.kt`, `GenContextLocator.kt` | Locate and spawn the SigMap CLI with the IDE's shell environment |
+| `RegenerateAction.kt`, `OpenContextFileAction.kt`, `ViewRoadmapAction.kt` | Menu and status-bar actions |
+| `SigMapQuery.kt`, `SigMapToolWindowFactory.kt` | The "Ask" tool window |
+| `SigMapSettings.kt`, `SigMapConfigurable.kt` | Settings page (Tools, SigMap) |
+| `SigMapContextListener.kt` | Watches the context file and refreshes the status bar |
+
+Plugin metadata is in `src/main/resources/META-INF/plugin.xml`; the version and compatibility range are in `build.gradle.kts` and `gradle.properties`. Add user-visible changes to [CHANGELOG.md](CHANGELOG.md).
+
+### Releasing
+
+Pushing a tag that starts with `jetbrains-v` (for example `jetbrains-v4.3.2`) runs `.github/workflows/release.yml`, which sets the plugin version from the tag, checks it, then builds, verifies and publishes the plugin to the JetBrains Marketplace. The build reads these environment variables, which must exist as repository secrets: `CERTIFICATE_CHAIN`, `PRIVATE_KEY`, `PRIVATE_KEY_PASSWORD`, `PUBLISH_TOKEN`.
+
+---
+
 ## Links
 
 | | |
